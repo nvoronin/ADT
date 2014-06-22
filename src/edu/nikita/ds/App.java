@@ -1,11 +1,10 @@
 package edu.nikita.ds;
 
 
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
-
 
 
 /**
@@ -38,7 +37,7 @@ public class App
        maze.generate(0, 0, false);
        maze.print();
        System.out.println();
-       MazeWalker.walkIt(maze);
+       MazeWalker.memoryWalk(maze, 0, 0, new HashSet<Tuple>());
        maze.print();
 	}
 
@@ -191,7 +190,4 @@ public class App
     	for(BTree node : ls)
     		System.out.print(node.value  + " -> ");
     }
-    
-    
-    
 }

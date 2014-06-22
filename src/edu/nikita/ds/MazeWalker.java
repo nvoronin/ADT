@@ -1,5 +1,7 @@
 package edu.nikita.ds;
 
+import java.util.Set;
+
 public class MazeWalker {
 
     static final char wall = '0';
@@ -83,4 +85,119 @@ public class MazeWalker {
         }
         return Direction.FromTheLeft;
     }
+
+    public static void walkItDown(Maze maze) {
+        int index = 0;
+        int y = 0, x = 0;
+        boolean forward = true;
+        while(y != maze.n - 1 || x != maze.m - 1) {
+
+            if(tryToGoIn(y + 1, x, maze) && !tryToGoIn(y, x - 1, maze) && forward)
+            {
+                while (tryToGoIn(y + 1, x, maze) && !tryToGoIn(y, x - 1, maze)) {
+                    maze.maze[y][x] = path;
+                    y++;
+                }
+                if(tryToGoIn(y, x - 1, maze)) {
+                    x--;
+                    forward = false;
+                }
+            }
+
+            if(tryToGoIn(y, x + 1, maze) && !tryToGoIn(y + 1, x, maze) && forward) {
+                while (tryToGoIn(y, x + 1, maze) && !tryToGoIn(y + 1, x, maze)) {
+                    maze.maze[y][x] = path;
+                    x++;
+                }
+                if(tryToGoIn(y + 1, x, maze))
+                    y++;
+            }
+
+            if(tryToGoIn(y - 1, x, maze) && !tryToGoIn(y, x + 1, maze) && !forward) {
+                while (tryToGoIn(y - 1, x, maze) && !tryToGoIn(y, x + 1, maze)) {
+                    maze.maze[y][x] = path;
+                    y--;
+                }
+                if(tryToGoIn(y, x + 1, maze)) {
+                    x++;
+                    forward = true;
+                }
+            }
+
+            if(tryToGoIn(y, x - 1, maze) && !tryToGoIn(y - 1, x, maze) && !forward)
+            {
+                while (tryToGoIn(y, x - 1, maze) && !tryToGoIn(y - 1, x, maze)) {
+                    maze.maze[y][x] = path;
+                    x--;
+                }
+                if(tryToGoIn(y - 1, x, maze)) {
+                    y--;
+                }
+            }
+
+            index++;
+
+            if(index == 100)
+                maze.print();
+        }
+    }
+
+    public static boolean memoryWalk(Maze maze, int x, int y, Set<Tuple> visited) {
+        if (!tryToGoIn(x, y, maze))
+            return false;
+
+        if (isExit(x, y, maze))
+            return true;
+
+        boolean result;
+
+        Tuple next = new Tuple(x + 1, y);
+        result = checkSubPath(maze, visited, next);
+
+        if (result) {
+            return true;
+        }
+
+        next = new Tuple(x, y + 1);
+        result = checkSubPath(maze, visited, next);
+
+        if (result) {
+            return true;
+        }
+
+        next = new Tuple(x, y - 1);
+        result = checkSubPath(maze, visited, next);
+
+        if (result) {
+            return true;
+        }
+
+        next = new Tuple(x-1, y);
+        result = checkSubPath(maze, visited, next);
+
+        if (result) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static boolean checkSubPath(Maze maze, Set<Tuple> visited, Tuple next) {
+        boolean result = false;
+        if(!visited.contains(next)){
+            visited.add(next);
+            result = memoryWalk(maze, next.x, next.y, visited);
+        }
+
+        if (result) {
+            maze.maze[next.x][next.y] = path;
+        }
+
+        return result;
+    }
+
+    private static boolean isExit(int x, int y, Maze maze) {
+        return x == maze.n - 1 && y == maze.m - 1;
+    }
+
 }
